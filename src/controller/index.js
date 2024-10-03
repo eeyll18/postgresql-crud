@@ -24,7 +24,35 @@ const addUser = async (req, res) => {
   }
 };
 
+const updateUser = async (req,res)=>{
+  const {id}=req.params
+  const {  name, email, hashed_password } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE table_test SET name=$1, email=$2, hashed_password=$3 WHERE user_id=$4 RETURNING *",
+      [name, email, hashed_password, id]
+    );
+    return res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error updating user:", err);
+    res.status(500).json({ error: "Could not update user" });
+  }
+}
+
+const deleteUser = async(req,res)=>{
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM table_test WHERE user_id=$1", [id]);
+    res.json({ message: "User deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting user:", err);
+    res.status(500).json({ error: "Could not delete user" });
+  }
+}
+
 module.exports = {
   getAllUsers,
   addUser,
+  updateUser,
+  deleteUser
 };
