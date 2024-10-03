@@ -9,6 +9,18 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getUserById = async(req,res)=>{
+  const { id } = req.params;
+  try {
+    const result = await pool.query("SELECT * FROM table_test WHERE user_id=$1", [id]);
+    if (!result.rows[0]) return res.status(404).json({ error: "User not found" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Error getting user by ID:", err);
+    res.status(500).json({ error: "Could not get user" });
+  }
+}
+
 const addUser = async (req, res) => {
   const { name, email, hashed_password } = req.body;
   const join_date = new Date();
@@ -52,6 +64,7 @@ const deleteUser = async(req,res)=>{
 
 module.exports = {
   getAllUsers,
+  getUserById,
   addUser,
   updateUser,
   deleteUser
